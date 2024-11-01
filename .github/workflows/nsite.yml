@@ -2,7 +2,7 @@ name: Deploy nsite
 on:
   push:
     branches:
-      - master
+      - main
 
 concurrency:
   group: "nsite"
