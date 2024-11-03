@@ -20,7 +20,7 @@ let relays: Writable<NostrEvent[]> = writable([]);
 const filters = [
     {
         kinds: [30166],
-        limit: 1000
+        limit: 300
         // since: Math.round(Date.now() / 1000) - 60 * 60
     }
 ]

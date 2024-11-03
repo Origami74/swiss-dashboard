@@ -7,6 +7,7 @@ import {getDecodedToken, getEncodedToken} from "@cashu/cashu-ts";
 import {Textarea} from "@/components/ui/textarea";
 
 import { ProxyWebSocket} from "./ws";
+import {CopyIcon} from "lucide-svelte";
 
 let ws: ProxyWebSocket | WebSocket | undefined = undefined;
 
@@ -229,8 +230,22 @@ async function withdraw() {
             <div class="bg-card text-card-foreground rounded-xl border shadow col-span-3">
                 <div class="flex flex-col space-y-1.5 p-6 pb-0"><h3 class="font-semibold leading-none tracking-tight">Proxy presets</h3>
                     <p class="text-muted-foreground text-sm">copy/paste some of these examples:</p></div>
-                <div class="p-6">
-                    hello
+
+                <div class="p-2">
+                    <Button on:click={() => navigator.clipboard.writeText("wss://proxy.stens.dev")}><CopyIcon class="text-muted-foreground h-4 w-4" /></Button>wss://proxy.stens.dev
+                </div>
+                <div class="p-2">
+                    <Button on:click={() => navigator.clipboard.writeText("wss://relay.damus.io")}><CopyIcon class="text-muted-foreground h-4 w-4" /></Button>wss://relay.damus.io
+                </div>
+                <div class="p-2">
+                    <Button on:click={() => navigator.clipboard.writeText("ws://oxtrdevav64z64yb7x6rjg4ntzqjhedm5b5zjqulugknhzr46ny2qbad.onion")}><CopyIcon class="text-muted-foreground h-4 w-4" /></Button>Epoxy hzrd
+                </div>
+                <div class="p-2">
+
+                    <Button on:click={() => navigator.clipboard.writeText("ws://437fqnfqtcaquzvs5sd43ugznw7dsoatvtskoowgnpn6q5vqkljcrsyd.onion/")}><CopyIcon class="text-muted-foreground h-4 w-4" /></Button>TOR Sattelite node
+                </div>
+                <div class="p-2">
+                    <Button on:click={() => navigator.clipboard.writeText("6274e64ed65df73d8cdad414fbb67d9ae5d87579d8d4e1a2d19312fadbd23b3b")}><CopyIcon class="text-muted-foreground h-4 w-4" /></Button>Pubkey
                 </div>
             </div>
         </div>
