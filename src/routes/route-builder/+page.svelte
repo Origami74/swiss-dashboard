@@ -103,13 +103,13 @@ function connect(){
             showFilter = true;
         };
 
-        ws.onerror = (e) => {
+        ws.onerror = (e: Event) => {
             // @ts-expect-error
-            log("+ Error " + e.message);
+            log("+ Error " + JSON.stringify(e.message));
         };
 
-        ws.onclose = () => {
-            log("+ Closed");
+        ws.onclose = (ev: CloseEvent) => {
+            log(`+ Closed with code ${ev.code} reason: ${ev.reason}`);
             showFilter = false;
         };
 

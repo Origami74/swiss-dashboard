@@ -167,9 +167,9 @@ export class ProxyWebSocket extends EventTarget implements WebSocket, ProxyHandl
   }
   private upstreamProxyError(message?: string) {
     // @ts-expect-error
-    const event = new Event("error", { message });
+    const event = new Event("error", { message: message });
     this._readyState = WebSocket.CLOSED;
-    this.onerror?.(event);
+    this.onclose?.(new CloseEvent("close", {reason: message}));
     this.ws.close();
     this.dispatchEvent(event);
   }
