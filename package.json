@@ -1,6 +1,6 @@
 {
-	"name": "stensdev-dashboard",
-	"version": "0.0.1",
+	"name": "superdash",
+	"version": "1.0.0",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
