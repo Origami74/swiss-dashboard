@@ -1,17 +1,24 @@
 # sv
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+The everything dashboard
 
-## Creating a project
+##
+Visit [this site](http://npub1dmj6nks3tey4mpj32wcepvrjswqlush5dx3x3m77kh0yjl3h3s8qhhrlhz.nsite.lol).
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Build
 
 ```bash
-# create a new project in the current directory
-npx sv create
+npm run build
+```
 
-# create a new project in my-app
-npx sv create my-app
+## Publishing nsite
+
+```bash
+npx nsite-cli@0.1.12 upload \
+--relays 'wss://nos.lol,wss://relay.primal.net,wss://relay.nostr.band,wss://relay.damus.io' \
+--servers 'https://cdn.satellite.earth,https://files.v0l.io' \
+--privatekey NSITE_PRIVATEKEY \
+  build
 ```
 
 ## Developing
