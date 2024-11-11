@@ -30,4 +30,4 @@ jobs:
         run: pnpm vite build
 
       - name: Deploy nsite
-        run: npx -y nsite-cli upload build --verbose --purge --privatekey ${{ secrets.NSITE_KEY }}
+        run: npx -y nsite-cli@0.1.12 upload build --verbose --purge --privatekey ${{ secrets.NSITE_KEY }}
