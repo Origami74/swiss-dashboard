@@ -17,7 +17,7 @@ npm run build
 npx nsite-cli@0.1.12 upload \
 --relays 'wss://nos.lol,wss://relay.primal.net,wss://relay.nostr.band,wss://relay.damus.io' \
 --servers 'https://cdn.satellite.earth,https://files.v0l.io' \
---privatekey NSITE_PRIVATEKEY \
+--privatekey $NSITE_PRIVATEKEY \
   build
 ```
 
