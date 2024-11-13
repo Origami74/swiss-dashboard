@@ -6,6 +6,7 @@
     import * as Table from "$lib/components/ui/table/index.js";
     import * as Avatar from "$lib/components/ui/avatar/index.js";
     import { Button } from "$lib/components/ui/button/index.js";
+    import * as Card from "$lib/components/ui/card/index.js";
     import {CopyIcon, Heart, HeartPulseIcon} from "lucide-svelte";
 
 
@@ -37,9 +38,11 @@
             price: Number(getTag(evnt, 'price')?.[1]) ?? 0,
             unit: getTag(evnt, 'price')?.[2] ?? "?",
             networks: getTags(evnt, 'n')?.map(nTag => nTag[1]) ?? ["?"],
+            urls: getTags(evnt, 'url') ?? [],
             pubkey: evnt.pubkey,
             statusColor: getStatusColor(evnt.created_at),
             mint: getTag(evnt, 'mint')?.[1] ?? "?",
+            hidden: true
         }
     })
 </script>
@@ -60,10 +63,10 @@
     </Table.Header>
     <Table.Body>
         {#each proxyDTOs as proxy, i (i)}
-            <Table.Row>
+            <Table.Row on:click={() => proxyDTOs[i].hidden = !proxyDTOs[i].hidden}>
                 <Table.Cell class="font-medium">
                     <Avatar.Root>
-                        <Avatar.Image src="{proxy.picture}" alt="@shadcn" />
+                        <Avatar.Image src="{proxy.picture}" alt="@profilePicture" />
                         <Avatar.Fallback>PX</Avatar.Fallback>
                     </Avatar.Root>
                 </Table.Cell>
@@ -74,6 +77,33 @@
                 <Table.Cell>{`${proxy.pubkey.substring(0, 3)}...${proxy.pubkey.substring(61, 64)}`} <Button variant="secondary" on:click={() => navigator.clipboard.writeText(proxy.pubkey)}><CopyIcon class="text-muted-foreground h-4 w-4" /></Button></Table.Cell>
                 <Table.Cell>{proxy.mint}</Table.Cell>
                 <Table.Cell class="text-right">{proxy.networks.join(", ")}</Table.Cell>
+            </Table.Row>
+            <Table.Row hidden="{proxy.hidden}">
+                <Table.Cell colSpan={8}>
+                    <div class="grid md:grid-cols-4 gap-4 col-span-full">
+                        <div class="flex flex-col">
+                            <Card.Root class="w-[250px] flex flex-col space-y-1.5 p-6 pb-0">
+                                <Card.Content>
+                                    <img src="{proxy.picture}" alt="@profilePicture" />
+                                </Card.Content>
+                            </Card.Root>
+                        </div>
+                        <div class="flex flex-col">
+                            <Card.Root class="flex flex-col">
+                                <Card.Header>
+                                    <Card.Title>Networks</Card.Title>
+                                </Card.Header>
+                                <Card.Content>
+                                    {#each proxy.urls as url}
+                                        {url[2]} - {url[1]} <Button variant="secondary" on:click={() => navigator.clipboard.writeText(url[1])}><CopyIcon class="text-muted-foreground h-4 w-4" /></Button><br/>
+                                    {/each}
+                                </Card.Content>
+                            </Card.Root>
+                        </div>
+                    </div>
+
+
+                </Table.Cell>
             </Table.Row>
         {/each}
     </Table.Body>

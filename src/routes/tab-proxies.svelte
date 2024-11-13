@@ -6,7 +6,7 @@ import CreditCard from "lucide-svelte/icons/credit-card";
 
 import * as Card from "$lib/components/ui/card/index.js";
 import * as Tabs from "$lib/components/ui/tabs/index.js";
-import { NRelay1, NPool, type NostrEvent, NSet } from "@nostrify/nostrify";
+import { NRelay1, NPool, type NostrEvent, NCache } from "@nostrify/nostrify";
 
 import {writable, type Writable} from "svelte/store";
 
@@ -14,7 +14,8 @@ import {writable, type Writable} from "svelte/store";
 import {pool} from "@/index";
 import {ProxiesTable} from "./index";
 
-const cache: NSet = new NSet();
+const cache = new NCache({ max: 1000 });
+
 let proxies: Writable<NostrEvent[]> = writable([]);
 
 const filters = [
@@ -41,11 +42,37 @@ async function handle(nostrEvent: NostrEvent) {
     if (cache.has(nostrEvent)) {
         return;
     }
-    cache.add(nostrEvent);
-    // console.log(nostrEvent)
 
-    // console.log(`Handling event ${nostrEvent.id}`)
+    cache.add(nostrEvent);
+
+    const transportMethods = await getTransportMethods(nostrEvent.pubkey);
+
+    if(transportMethods){
+        console.log(`transportMethods: ${JSON.stringify(transportMethods)}`);
+    } else {
+        console.log(`No transport methods found`)
+    }
+
     proxies.update(px => px.concat([nostrEvent]))
+}
+
+async function getTransportMethods(pubkey: string): Promise<NostrEvent | undefined> {
+    const transportMethodsFilters = [{ kinds: [11111], authors: [pubkey], limit: 1 }]
+    const cachedMethods = await cache.query(transportMethodsFilters);
+
+    if(cachedMethods.length === 1){
+        return cachedMethods[0]
+    }
+
+    for await (const msg of pool.req(transportMethodsFilters)) {
+        if (msg[0] === 'EVENT') {
+            cache.add(msg[2]);
+            return msg[2];
+        }
+        if (msg[0] === 'EOSE') break; // Sends a `CLOSE` message to the relay.
+    }
+
+    return undefined;
 }
 
 </script>

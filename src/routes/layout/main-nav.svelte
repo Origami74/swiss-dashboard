@@ -6,11 +6,6 @@
 	let className: string | undefined | null = undefined;
 	export { className as class };
 
-	let feedbackOpen = false;
-	function openFeedbackForm() {
-		feedbackOpen = true;
-	}
-
 </script>
 
 <nav class={cn("flex items-center space-x-4 lg:space-x-6", className)}>
