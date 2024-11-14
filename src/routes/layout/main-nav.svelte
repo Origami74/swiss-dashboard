@@ -15,6 +15,9 @@
 	<a href="/route-builder" class="hover:text-primary text-sm font-medium transition-colors">
 		Route Builder
 	</a>
+	<a href="/feedback" class="hover:text-primary text-sm font-medium transition-colors">
+		Feedback
+	</a>
 	<FeedbackForm/>
 </nav>
 

@@ -44,7 +44,7 @@
         const signer = new NSecSigner("4e007801c927832ebfe06e57ef08dba5aefe44076a0add96b1700c9061313490");
 
         const note = {
-            kind: 1,
+            kind: 1111,
             pubkey: signer.getPublicKey(),
             content: JSON.stringify(content),
             created_at: nostrNow(),
