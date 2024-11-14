@@ -2,7 +2,7 @@
 	import Search from "lucide-svelte/icons/search";
 	import { primaryRoutes, secondaryRoutes } from "../config.js";
 	import { mailStore } from "../store.js";
-	import type { Account, Mail } from "../data.js";
+	import type { Project, Mail } from "../data.js";
 	import AccountSwitcher from "./account-switcher.svelte";
 	import MailDisplay from "./mail-display.svelte";
 	import MailList from "./mail-list.svelte";
@@ -13,13 +13,16 @@
 	import { Separator } from "$lib/components/ui/select/index.js";
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
 
-	export let accounts: Account[];
+	export let accounts: Project[];
 	export let mails: Mail[];
+	export let reactions: Mail[];
 	export let defaultLayout = [265, 440, 655];
 	export let defaultCollapsed = false;
 	export let navCollapsedSize: number;
 
 	let isCollapsed = defaultCollapsed;
+
+	console.log(`reactions: ${reactions?.length}`)
 
 	function onLayoutChange(sizes: number[]) {
 		document.cookie = `PaneForge:layout=${JSON.stringify(sizes)}`;
@@ -92,16 +95,16 @@
 					</form>
 				</div>
 				<Tabs.Content value="all" class="m-0">
-					<MailList items={mails} />
+					<MailList items={reactions} />
 				</Tabs.Content>
 				<Tabs.Content value="unread" class="m-0">
-					<MailList items={mails.filter((item) => !item.read)} />
+					<MailList items={reactions.filter((item) => !item.read)} />
 				</Tabs.Content>
 			</Tabs.Root>
 		</Resizable.Pane>
 		<Resizable.Handle withHandle />
 		<Resizable.Pane defaultSize={defaultLayout[2]}>
-			<MailDisplay mail={mails.find((item) => item.id === $mailStore.selected) || null} />
+			<MailDisplay mail={reactions.find((item) => item.id === $mailStore.selected) || null} />
 		</Resizable.Pane>
 	</Resizable.PaneGroup>
 </div>

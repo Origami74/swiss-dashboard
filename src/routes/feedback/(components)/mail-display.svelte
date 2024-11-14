@@ -13,6 +13,12 @@
 	import { Switch } from "$lib/components/ui/switch/index.js";
 	import { Textarea } from "$lib/components/ui/textarea/index.js";
 	import * as Tooltip from "$lib/components/ui/tooltip/index.js";
+	import {nostrNow} from "@/utils/nostrUtils";
+	import {pool} from "@/index";
+	import { Address } from '@welshman/util';
+	import {PartyPopper} from "lucide-svelte";
+
+	import * as Alert from "$lib/components/ui/alert/index.js";
 
 	export let mail: Mail | null = null;
 
@@ -35,6 +41,64 @@
 			return todayDate.toDate();
 		}
 		return todayDate.add({ days: 6 - dayOfWeek }).toDate();
+	}
+
+	let replyValue: string = ""
+	async function sendReply() {
+		console.log(`replying: ${replyValue}`)
+
+		const note = {
+			kind: 1111,
+			pubkey: await window.nostr.getPublicKey(),
+			content: replyValue,
+			created_at: nostrNow(),
+			tags: [
+				["p", mail?.senderPubkey],
+				["i", mail?.id],
+				["k", "1111"]
+			],
+		};
+		// const event = await signer.signEvent(note);
+
+		console.log(`singing by: ${await window.nostr.getPublicKey()}`)
+		const event = await window.nostr.signEvent(note); // takes an event object, adds `id`, `pubkey` and `sig` and returns it
+
+
+		await pool.event(event);
+	}
+
+	async function createIssue() {
+		console.log(`replying: ${replyValue}`)
+
+		const issueContent = `[Opened through backfeed.site]
+		**subject:** ${mail?.subject}
+		**category:** ${mail?.category}
+		**host:** ${mail?.host}
+		**path:** ${mail?.path}
+
+
+		**---- [USER FEEDBACK] ----**
+		${mail?.text}
+		`;
+
+		const note = {
+			kind: 1621,
+			pubkey: await window.nostr.getPublicKey(),
+			content: issueContent,
+			created_at: nostrNow(),
+			tags: [
+				["a",  `${mail?.repoAddress?.kind}:${mail?.repoAddress?.pubkey}:${mail?.repoAddress?.identifier}`],
+				["p", mail?.repoAddress?.pubkey],
+				["subject", mail?.subject],
+				["t", mail?.category]
+			],
+		};
+
+		console.log(`singing by: ${await window.nostr.getPublicKey()}`)
+		const event = await window.nostr.signEvent(note); // takes an event object, adds `id`, `pubkey` and `sig` and returns it
+
+
+		await pool.event(event);
 	}
 </script>
 
@@ -168,6 +232,7 @@
 				</Tooltip.Trigger>
 				<Tooltip.Content>Forward</Tooltip.Content>
 			</Tooltip.Root>
+			<Button on:click={async () => await createIssue()}>Create issue</Button>
 		</div>
 		<Separator orientation="vertical" class="mx-2 h-6" />
 		<DropdownMenu.Root>
@@ -218,18 +283,25 @@
 			</div>
 			<Separator />
 			<div class="flex-1 overflow-y-auto whitespace-pre-wrap p-4 text-sm">
+				<b>subject: </b> {mail.subject}<br/>
+				<b>category: </b> {mail.category}<br/>
+				<b>host: </b> {mail.host}<br/>
+				<b>path: </b> {mail.path}<br/>
+				<br/>
+				<br/>
+				<b>---- [USER FEEDBACK] ----</b><br/>
 				{mail.text}
 			</div>
 			<Separator class="mt-auto" />
 			<div class="p-4">
 				<form>
 					<div class="grid gap-4">
-						<Textarea class="p-4" placeholder={`Reply ${mail.name}...`} />
+						<Textarea class="p-4" bind:value={replyValue} placeholder={`Reply ${mail.name}...`} />
 						<div class="flex items-center">
 							<Label for="mute" class="flex items-center gap-2 text-xs font-normal">
 								<Switch id="mute" aria-label="Mute thread" /> Mute this thread
 							</Label>
-							<Button size="sm" class="ml-auto">Send</Button>
+							<Button on:click={async () => await sendReply()} size="sm" class="ml-auto">Send</Button>
 						</div>
 					</div>
 				</form>
@@ -239,3 +311,10 @@
 		<div class="text-muted-foreground p-8 text-center">No message selected</div>
 	{/if}
 </div>
+
+
+<Alert.Root hidden="{false}">
+	<PartyPopper class="h-4 w-4" />
+	<Alert.Title>Thank You!</Alert.Title>
+	<Alert.Description>Your feedback has been sent</Alert.Description>
+</Alert.Root>

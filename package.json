@@ -44,6 +44,7 @@
 		"@cashu/cashu-ts": "^1.2.1",
 		"@nostrify/nostrify": "npm:@jsr/nostrify__nostrify@^0.36.1",
 		"@sveltejs/adapter-static": "^3.0.6",
+		"@welshman/util": "^0.0.45",
 		"lru-cache": "^11.0.2",
 		"nsite-cli": "^0.1.13",
 		"radix-svelte": "^0.9.0",

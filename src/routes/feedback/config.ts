@@ -17,15 +17,9 @@ export const primaryRoutes: Route[] = [
 		variant: "default",
 	},
 	{
-		title: "Drafts",
+		title: "Issues",
 		label: "9",
 		icon: Icons.File,
-		variant: "ghost",
-	},
-	{
-		title: "Sent",
-		label: "",
-		icon: Icons.Send,
 		variant: "ghost",
 	},
 	{
@@ -40,43 +34,13 @@ export const primaryRoutes: Route[] = [
 		icon: Icons.Trash2,
 		variant: "ghost",
 	},
-	{
-		title: "Archive",
-		label: "",
-		icon: Icons.Archive,
-		variant: "ghost",
-	},
 ];
 
 export const secondaryRoutes: Route[] = [
 	{
-		title: "Social",
-		label: "972",
+		title: "Other",
+		label: "1",
 		icon: Icons.Users,
 		variant: "ghost",
-	},
-	{
-		title: "Updates",
-		label: "342",
-		icon: Icons.CircleAlert,
-		variant: "ghost",
-	},
-	{
-		title: "Forums",
-		label: "128",
-		icon: Icons.MessagesSquare,
-		variant: "ghost",
-	},
-	{
-		title: "Shopping",
-		label: "8",
-		icon: Icons.ShoppingCart,
-		variant: "ghost",
-	},
-	{
-		title: "Promotions",
-		label: "21",
-		icon: Icons.Archive,
-		variant: "ghost",
-	},
+	}
 ];

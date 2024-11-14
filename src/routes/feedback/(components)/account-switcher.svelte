@@ -1,19 +1,19 @@
 <script lang="ts">
-	import type { Account } from "../data.js";
+	import type { Project } from "../data.js";
 	import * as Select from "$lib/components/ui/select/index.js";
 	import { cn } from "$lib/utils.js";
 
 	export let isCollapsed: boolean;
-	export let accounts: Account[];
+	export let accounts: Project[];
 
 	let selectedAccount = accounts[0];
 </script>
 
 <Select.Root
 	portal={null}
-	selected={{ value: selectedAccount.email, label: selectedAccount.label }}
+	selected={{ value: selectedAccount.identifier, label: selectedAccount.displayName }}
 	onSelectedChange={(e) => {
-		selectedAccount = accounts.find((account) => account.email === e?.value) || accounts[0];
+		selectedAccount = accounts.find((account) => account.identifier === e?.value) || accounts[0];
 	}}
 >
 	<Select.Trigger
@@ -27,14 +27,14 @@
 		<span class="pointer-events-none">
 			<svelte:component this={selectedAccount.icon} class={cn(isCollapsed ? "ml-2" : "")} />
 			<span class={cn(isCollapsed ? "!ml-0 !hidden" : "ml-2")}>
-				{selectedAccount.label}
+				{selectedAccount.displayName}
 			</span>
 		</span>
 	</Select.Trigger>
 	<Select.Content sameWidth={!isCollapsed} align={isCollapsed ? "start" : undefined}>
 		<Select.Group>
 			{#each accounts as account}
-				<Select.Item value={account.email} label={account.label}>
+				<Select.Item value={account.identifier} label={account.displayName}>
 					<div
 						class="[&_svg]:text-foreground flex items-center gap-3 [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0"
 					>
@@ -43,7 +43,7 @@
 							aria-hidden="true"
 							class="text-foreground size-4 shrink-0"
 						/>
-						{account.email}
+						{account.identifier}
 					</div>
 				</Select.Item>
 			{/each}
