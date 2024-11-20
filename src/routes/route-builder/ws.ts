@@ -1,10 +1,7 @@
-import { type Proof } from "@cashu/cashu-ts";
+import { type Proof, PaymentRequest } from "@cashu/cashu-ts";
+import { NSecSigner } from "@nostrify/nostrify";
+import {nostrNow} from "@/utils/nostrUtils";
 
-export type PaymentRequest = {
-  price: number;
-  unit?: string;
-  mint: string;
-};
 export type Payment = Proof[];
 
 type NostrEvent = {
@@ -22,18 +19,18 @@ export type ProxyRequestMessage = ["PROXY", string] | ["PROXY", string, PaymentR
 export type ProxyConnectingMessage = ["PROXY", "CONNECTING"];
 export type ProxyConnectedMessage = ["PROXY", "CONNECTED"];
 export type ProxyErrorMessage = ["PROXY", "ERROR", string];
-export type ProxyAuthRequiredMessage = ["PROXY", "AUTH_REQUIRED", string];
-export type ProxyPaymentRequestMessage = ["PROXY", "PAYMENT_REQUIRED", PaymentRequest];
+export type NIP42PaymentRequestMessage = ["AUTH", string, PaymentRequest];
+export type NIP42AuthMessage = ["AUTH", string];
 
 export type ProxyMessage =
   | ProxyConnectingMessage
   | ProxyConnectedMessage
   | ProxyErrorMessage
-  | ProxyAuthRequiredMessage
-  | ProxyPaymentRequestMessage;
+  | NIP42PaymentRequestMessage
+  | NIP42AuthMessage;
 
 export type ProxyHandlers = {
-  onPaymentRequest?: (socket: WebSocket, hop: string, request: PaymentRequest) => Promise<Payment | null>;
+  onPaymentRequest?: (socket: WebSocket, hop: string, request: PaymentRequest) => Promise<string | null>;
   onAuthRequest?: (socket: WebSocket, hop: string, challenge: string) => Promise<NostrEvent | null>;
 };
 
@@ -48,15 +45,16 @@ export class ProxyWebSocket extends EventTarget implements WebSocket, ProxyHandl
   onproxy: ((this: WebSocket, hop: string) => any) | null = null;
 
   // handlers
-  onPaymentRequest?: (socket: WebSocket, hop: string, request: PaymentRequest) => Promise<Payment | null>;
+  onPaymentRequest?: (socket: WebSocket, hop: string, request: PaymentRequest) => Promise<string | null>;
   onAuthRequest?: (socket: WebSocket, hop: string, challenge: string) => Promise<NostrEvent | null>;
 
   url: string;
-
   hops: string[];
   private hopIndex = 0;
 
   private ws: WebSocket;
+  private authEventId: string;
+
   constructor(proxyUrl: string, hops: string[], handlers?: ProxyHandlers) {
     super();
     if (hops.length === 0) throw new Error("Missing hops");
@@ -74,10 +72,9 @@ export class ProxyWebSocket extends EventTarget implements WebSocket, ProxyHandl
       try {
         const message = JSON.parse(event.data) as ProxyMessage;
         if (!Array.isArray(message)) throw new Error("Message is not a json array");
-
+        const hop = this.hops[this.hopIndex];
+        console.log(event.data)
         if (message[0] === "PROXY") {
-          const hop = this.hops[this.hopIndex];
-
           switch (message[1]) {
             case "CONNECTING":
               this._readyState = WebSocket.CONNECTING;
@@ -86,36 +83,53 @@ export class ProxyWebSocket extends EventTarget implements WebSocket, ProxyHandl
               this.hopIndex++;
               this.upstreamProxyConnected();
               break;
-            case "PAYMENT_REQUIRED": {
-              const [_, _payment, request] = message;
-              const payment = await this.onPaymentRequest?.(this, hop, request);
-
-              if (payment === null) {
-                // cancel
-                this.close();
-              } else {
-                // retry proxy with payment
-                this.ws.send(JSON.stringify(["PROXY", hop, payment]));
-              }
-              break;
-            }
-            case "AUTH_REQUIRED": {
-              const [_, _auth, challenge] = message;
-              const auth = await this.onAuthRequest?.(this, hop, challenge);
-              if (auth === null) {
-                // cancel
-                this.close();
-              } else {
-                // retry proxy hop with auth
-                this.ws.send(JSON.stringify(["PROXY", hop, auth]));
-              }
-              break;
-            }
             case "ERROR":
               this.upstreamProxyError(message[2]);
               break;
             default:
               throw new Error(`Unknown PROXY response: ${message[1]}`);
+          }
+        } else if(message[0] === "AUTH") {
+          const challengeString = message[1];
+          const paymentRequest = message[2];
+          if(paymentRequest){
+            const payment = await this.onPaymentRequest?.(this, hop, paymentRequest!);
+
+            console.log(payment);
+            if (payment === null) {
+              // cancel
+              this.close();
+            } else {
+              // retry proxy with payment
+              const authEvent = {
+                "kind": 22242,
+                "tags": [
+                  ["relay", hop],
+                  ["challenge", challengeString]
+                ],
+                "content": payment ?? "",
+                "created_at": nostrNow()
+              }
+
+              const signer = new NSecSigner("4e007801c927832ebfe06e57ef08dba5aefe44076a0add96b1700c9061313490");
+              const signedAuthEvent = await signer.signEvent(authEvent);
+
+              this.authEventId = signedAuthEvent.id;
+
+              const authMsg = JSON.stringify(["AUTH", signedAuthEvent]);
+              this.ws.send(authMsg);
+            }
+          }
+        }  else if(message[0] === "OK") {
+          const eventId = message[1]
+          const successful = message[2]
+
+          if(eventId === this.authEventId && successful){
+            // RESEND proxy request
+            const message: ProxyRequestMessage = ["PROXY", this.hops[this.hopIndex]];
+            this.ws.send(JSON.stringify(message));
+          } else {
+            console.error(`Unknown PROXY response: ${message}`);
           }
         }
       } catch (error) {}

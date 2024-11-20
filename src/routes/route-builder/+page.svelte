@@ -71,9 +71,9 @@ function connect(){
 
             proxy.onPaymentRequest = async (socket, hop, request) => {
                 try {
-                    log(`+ Payment Required`);
+                    log(`+ AUTH by payment Required`);
                     const amountStr = prompt(
-                        [`Payment required (${request.price}${request.unit ?? ""}/KiB)`, `To relay: ${hop}`].join("\n"),
+                        [`Payment required (${request.amount}${request.unit ?? ""}/Min)`, `To relay: ${hop}`].join("\n"),
                     );
                     if (!amountStr) return null;
                     const amount = parseInt(amountStr);
@@ -81,8 +81,8 @@ function connect(){
                     updateWallet();
 
                     if (amount) {
-                        log("+ Paid");
-                        return token.proofs;
+                        log(`+ Paid ${amount}`);
+                        return getEncodedToken({ token: [token] });
                     }
                 } catch (error) {
                     console.log(error)

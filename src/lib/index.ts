@@ -1,7 +1,7 @@
 import { NPool, NRelay1, type NostrEvent } from "@nostrify/nostrify";
 
 
-const relays = ["wss://relay.nostr.watch","wss://relay.damus.io/", "wss://relay.primal.net/"];
+const relays = ["wss://relay.nostr.watch","wss://relay.damus.io/"];
 
 export const pool = new NPool({
     open(url) {
@@ -25,16 +25,26 @@ export const pool = new NPool({
 export async function getProfile(pubkey: string): Promise<NostrEvent | undefined> {
     const profileFilter = {
         kinds: [0],
-        authors: [pubkey]
+        authors: [pubkey],
+        limit: 1
     }
-
-    for await (const msg of pool.req([profileFilter], {})) {
+    console.log(`iterate`)
+    for await (const msg of pool.req([profileFilter])) {
+        console.log(`iterate`)
         if (msg[0] === 'EVENT') {
-            return msg[2]
+            const profileEvent = msg[2];
+            try{
+                return JSON.parse(profileEvent.content);
+            } catch (e) {
+                console.error("Unable to parse user profile content", e);
+                return undefined;
+            }
+
         }
         if (msg[0] !== 'EOSE') {
             console.log(`No profile found for ${pubkey}`)
             return undefined
         }
+
     }
 }

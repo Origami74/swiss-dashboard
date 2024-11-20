@@ -2,16 +2,7 @@
 	import * as DropdownMenu from "@/components/ui/dropdown-menu";
 	import * as Avatar from "@/components/ui/avatar";
 	import { Button } from "@/components/ui/button";
-	import {getProfile, pool} from "@/index";
-
-	type UserProfile = {
-		username: string;
-		displayName: string;
-		about: string;
-		picture: string;
-		banner: string;
-		nip05: string;
-	}
+	import {getProfile, pool, type UserProfile} from "@/index";
 
 	let userProfile: UserProfile | undefined;
 
@@ -33,21 +24,15 @@
 			return;
 		}
 
-		const profileMetaDataEvent = await getProfile(userPubkey);
+		const profile = await getProfile(userPubkey);
 
-		if(!profileMetaDataEvent){
+		if(!profile){
 			console.log("User profile not found.");
 			return;
 		}
 
-		try{
-			userProfile = JSON.parse(profileMetaDataEvent.content);
-		} catch (e) {
-			console.error("Unable to parse user profile content", e);
-			return;
-		}
-
-		console.log(userProfile);
+		userProfile = profile;
+		console.log(`userProfile: ${userProfile}`);
 	}
 
 </script>

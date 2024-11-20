@@ -19,8 +19,8 @@
 
 		return "secondary";
 	}
-</script>
 
+</script>
 <ScrollArea class="h-screen">
 	<div class="flex flex-col gap-2 p-4 pt-0">
 		{#each items as item}

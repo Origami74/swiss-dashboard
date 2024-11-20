@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { accounts, mails } from "./data.js";
 	import Mail from "./(components)/mail.svelte";
-	import {pool} from "@/index";
+	import {getProfile, pool} from "@/index";
 	import { NRelay1, NPool, type NostrEvent, NCache } from "@nostrify/nostrify";
 
 	import {writable, type Writable} from "svelte/store";
@@ -64,7 +64,6 @@
 		mails.push(mail);
 
 		reactions.update(reactions => reactions.concat([mail]))
-		console.log("added")
 	}
 
 </script>
