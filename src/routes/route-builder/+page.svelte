@@ -3,16 +3,15 @@
 import {Button} from "$lib/components/ui/button/index.js";
 import {Input} from "@/components/ui/input";
 import LocalWallet from "./local-wallet"
-import {getDecodedToken, getEncodedToken} from "@cashu/cashu-ts";
+import {getDecodedToken, getEncodedToken, PaymentRequest} from "@cashu/cashu-ts";
 import {Textarea} from "@/components/ui/textarea";
-
-import { ProxyWebSocket} from "./ws";
+import { ProxyWebSocket} from "@/epoxy/ws";
 import {CopyIcon} from "lucide-svelte";
+import {Epoxy} from "@/epoxy/epoxy";
 
 let ws: ProxyWebSocket | WebSocket | undefined = undefined;
 
 let balance = "0"
-let mint = ""
 let unit = ""
 
 let depositValue = ""
@@ -21,6 +20,29 @@ let withDrawToken = ""
 let logs = ""
 
 let wallet = new LocalWallet();
+
+let proxy1 = new Epoxy(onMessage, onPaymentRequest);
+
+async function onPaymentRequest(request: PaymentRequest) {
+    try {
+        const amountStr = prompt(
+            [`Payment required (${request.amount}${request.unit ?? ""}/Min)`].join("\n"),
+        );
+        if (!amountStr) return null;
+        const amount = parseInt(amountStr);
+        const token = await wallet.send(amount);
+        updateWallet();
+
+        if (amount) {
+            console.log(`+ Paid ${amount} ${request.unit}`);
+            return getEncodedToken({ token: [token] });
+        }
+    } catch (error) {
+        console.log(error)
+        if (error instanceof Error) alert(error.message);
+    }
+    return null;
+}
 
 let setupLocked = false
 let showFilter = false
@@ -50,75 +72,23 @@ function relayRequest(){
 }
 
 let incomingEvents: string[] = []
-function incomingEvent(eventData: string){
+function onMessage(eventData: string){
+    console.log(`incommiiiiiing: ${eventData}`)
     incomingEvents = incomingEvents.concat(eventData)
 }
 
-function connect(){
+async function connect(){
     setupLocked = true;
 
-    ws?.close();
-    try {
-        setupLocked = true;
+    ws = await proxy1.connect(hops)
 
-        const proxyUrl = hops[0];
-        const otherHops = hops.slice(1);
+    ws.onopen = () => {
+        console.log("+ Connected");
+        showFilter = true;
+    };
 
-        log("+ Connecting...");
-
-        if (otherHops.length > 0) {
-            const proxy = (ws = new ProxyWebSocket(proxyUrl, otherHops));
-
-            proxy.onPaymentRequest = async (socket, hop, request) => {
-                try {
-                    log(`+ AUTH by payment Required`);
-                    const amountStr = prompt(
-                        [`Payment required (${request.amount}${request.unit ?? ""}/Min)`, `To relay: ${hop}`].join("\n"),
-                    );
-                    if (!amountStr) return null;
-                    const amount = parseInt(amountStr);
-                    const token = await wallet.send(amount);
-                    updateWallet();
-
-                    if (amount) {
-                        log(`+ Paid ${amount}`);
-                        return getEncodedToken({ token: [token] });
-                    }
-                } catch (error) {
-                    console.log(error)
-                    if (error instanceof Error) alert(error.message);
-                }
-                return null;
-            };
-
-            proxy.onproxy = (hop) => {
-                log(`+ Connected to ${hop}`);
-            };
-        } else {
-            ws = new WebSocket(proxyUrl);
-        }
-
-        ws.onopen = () => {
-            log("+ Connected");
-            showFilter = true;
-        };
-
-        ws.onerror = (e: Event) => {
-            // @ts-expect-error
-            log("+ Error " + JSON.stringify(e.message));
-        };
-
-        ws.onclose = (ev: CloseEvent) => {
-            log(`+ Closed with code ${ev.code} reason: ${ev.reason}`);
-            showFilter = false;
-        };
-
-        ws.onmessage = (event) => {
-            incomingEvent(event.data);
-        };
-    } catch (error) {
-        console.log(error)
-        if (error instanceof Error) alert(error.message);
+    ws.onmessage = (evt) => {
+        onMessage(evt.data)
     }
 
     setupLocked = false;
@@ -128,7 +98,6 @@ function updateWallet() {
     const total = wallet.getBalance();
 
     balance = String(total);
-    mint = "";
 }
 
 async function deposit() {
