@@ -34,7 +34,7 @@ async function onPaymentRequest(request: PaymentRequest) {
         updateWallet();
 
         if (amount) {
-            console.log(`+ Paid ${amount} ${request.unit}`);
+            console.log(`User sending payment of ${amount} ${request.unit}`);
             return getEncodedToken({ token: [token] });
         }
     } catch (error) {
@@ -73,7 +73,6 @@ function relayRequest(){
 
 let incomingEvents: string[] = []
 function onMessage(eventData: string){
-    console.log(`incommiiiiiing: ${eventData}`)
     incomingEvents = incomingEvents.concat(eventData)
 }
 

@@ -28,9 +28,7 @@ export async function getProfile(pubkey: string): Promise<NostrEvent | undefined
         authors: [pubkey],
         limit: 1
     }
-    console.log(`iterate`)
     for await (const msg of pool.req([profileFilter])) {
-        console.log(`iterate`)
         if (msg[0] === 'EVENT') {
             const profileEvent = msg[2];
             try{
