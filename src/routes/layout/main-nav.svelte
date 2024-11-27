@@ -18,6 +18,12 @@
 	<a href="/feedback" class="hover:text-primary text-sm font-medium transition-colors">
 		Feedback
 	</a>
+	<a href="/tollbooth" class="hover:text-primary text-sm font-medium transition-colors">
+		Tollbooth
+	</a>
+	<a href="/fleetmanager" class="hover:text-primary text-sm font-medium transition-colors">
+		Fleet Manager
+	</a>
 	<FeedbackForm/>
 </nav>
 

@@ -18,6 +18,7 @@
 		"@tailwindcss/container-queries": "^0.1.1",
 		"@tailwindcss/forms": "^0.5.9",
 		"@tailwindcss/typography": "^0.5.15",
+		"@types/default-gateway": "^7.2.2",
 		"autoprefixer": "^10.4.20",
 		"bits-ui": "^0.21.16",
 		"clsx": "^2.1.1",
@@ -45,7 +46,9 @@
 		"@nostrify/nostrify": "npm:@jsr/nostrify__nostrify@^0.36.1",
 		"@sveltejs/adapter-static": "^3.0.6",
 		"@welshman/util": "^0.0.45",
+		"default-gateway": "^7.2.2",
 		"lru-cache": "^11.0.2",
+		"network": "^0.7.0",
 		"nsite-cli": "^0.1.13",
 		"radix-svelte": "^0.9.0",
 		"svelte-copy": "^2.0.0"
