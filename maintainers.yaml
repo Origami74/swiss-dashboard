@@ -9,4 +9,3 @@ relays:
 - wss://relay.nostrplebs.com/
 - wss://relay.fountain.fm/
 - wss://relay.stens.dev/
-- ws://127.0.0.1:4869/
