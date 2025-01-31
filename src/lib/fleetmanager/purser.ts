@@ -2,30 +2,32 @@ import {getEncodedToken, PaymentRequest} from "@cashu/cashu-ts";
 import {NRelay1, type NostrEvent, NSecSigner} from "@nostrify/nostrify";
 import {getTag, nostrNow} from "@/utils/nostrUtils";
 
-export interface IFleetManager {
+export interface IPurser {
     run(): Promise<void>;
 }
 
 export type OnMessageFn = (message: NostrEvent) => void
 
-export class FleetManager implements IFleetManager {
+export class Purser implements IPurser {
 
     private relay?: NRelay1;
-    private relayAddress = "wss://tollbooth.stens.dev"
+    // private relayAddress = "wss://tollbooth.stens.dev"
+    private relayAddress = "ws://localhost:7777"
     private accesspointAPubkey = "02d9613afcd8c0e292dab9dfccf5fd508e323eecedd84530afd81d506da3703c" // Same as tollbooth page!
 
     constructor() {
+
     }
 
     public async run(): Promise<void> {
-        this.relay = new NRelay1(this.relayAddress)
-
-        for await (const msg of this.relay.req([{ kinds: [55555], since: nostrNow()  }])) {
-            if (msg[0] === 'EVENT') {
-                await this.handleConnectionRequest(msg[2])
-            }
-            // if (msg[0] === 'EOSE') break; // Sends a `CLOSE` message to the relay.
-        }
+        // this.relay = new NRelay1(this.relayAddress)
+        //
+        // for await (const msg of this.relay.req([{ kinds: [55555], since: nostrNow()  }])) {
+        //     if (msg[0] === 'EVENT') {
+        //         await this.handleConnectionRequest(msg[2])
+        //     }
+        //     // if (msg[0] === 'EOSE') break; // Sends a `CLOSE` message to the relay.
+        // }
     }
 
 
@@ -52,7 +54,7 @@ export class FleetManager implements IFleetManager {
             tags: [
                 ["p", this.accesspointAPubkey],
                 ["mac", macAddress],
-                ["session-end", `${nostrNow() + 30}`], // 1 min access
+                ["session-end", `${nostrNow() + 600}`], // 1 min access
             ],
         };
         const signedEvent = await signer.signEvent(note);

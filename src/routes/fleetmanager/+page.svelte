@@ -7,11 +7,11 @@
     import * as Card from "$lib/components/ui/card/index.js";
     import * as Tabs from "$lib/components/ui/tabs/index.js";
     import ActiveConnectionsTab from "./tab-active-connections.svelte";
-    import {FleetManager} from "@/fleetmanager/fleetmanager";
+    import {Purser} from "@/fleetmanager/purser";
     import {NRelay1, NCache, type NostrEvent} from "@nostrify/nostrify";
     import {writable, type Writable} from "svelte/store";
 
-    const fleetManager = new FleetManager();
+    const fleetManager = new Purser();
 
     async function init() {
         await fleetManager.run();

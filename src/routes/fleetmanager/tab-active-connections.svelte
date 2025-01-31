@@ -4,8 +4,6 @@ import Users from "lucide-svelte/icons/users";
 import Activity from "lucide-svelte/icons/activity";
 import CreditCard from "lucide-svelte/icons/credit-card";
 
-import * as Card from "$lib/components/ui/card/index.js";
-import * as Tabs from "$lib/components/ui/tabs/index.js";
 import { NRelay1, NPool, type NostrEvent, NCache } from "@nostrify/nostrify";
 
 import {writable, type Writable} from "svelte/store";
@@ -13,7 +11,8 @@ import {SessionsTable} from "./index";
 import {getTag, nostrNow} from "@/utils/nostrUtils";
 
 let relay: NRelay1
-const relayAddress = "wss://tollbooth.stens.dev"
+// const relayAddress = "ws://119.201.26.1:2121/"
+const relayAddress = "ws://192.168.21.21:2121"
 
 const cache = new NCache({ max: 1000 });
 let sessions: Writable<NostrEvent[]> = writable([]);

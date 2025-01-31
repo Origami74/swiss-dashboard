@@ -24,6 +24,9 @@
 	<a href="/fleetmanager" class="hover:text-primary text-sm font-medium transition-colors">
 		Fleet Manager
 	</a>
+	<a href="/actions" class="hover:text-primary text-sm font-medium transition-colors">
+		GitHub Actions
+	</a>
 	<FeedbackForm/>
 </nav>
 

@@ -40,8 +40,9 @@ async function onPaymentRequest(request: PaymentRequest) {
 
 let randomPrivateKey = "4e007801c927832ebfe06e57ef08dba5aefe44076a0add96b1700c9061313490"
 
-let tollgatePubkey = "02d9613afcd8c0e292dab9dfccf5fd508e323eecedd84530afd81d506da3703c"
-let tollgateRelay = "wss://tollbooth.stens.dev"
+let tollgatePubkey = "c1f4c025e746fd307203ac3d1a1886e343bea76ceec5e286c96fb353be6cadea"
+let tollgateRelay = "ws://192.168.21.21:2121/"
+// let tollgateRelay = "ws://localhost:3334"
 let tollgateProduct = "min"
 let tollgatePriceUnit = "sat"
 let tollgateMint = "https://mint.minibits.cash/Bitcoin"
@@ -111,7 +112,7 @@ async function connect() {
     const signer = new NSecSigner(randomPrivateKey);
 
     const note = {
-        kind: 55555,
+        kind: 21000,
         pubkey: signer.getPublicKey(),
         content: "cashuAbcde",
         created_at: nostrNow(),
